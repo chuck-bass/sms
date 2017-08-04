@@ -1,0 +1,25 @@
+import httplib
+import urllib
+
+@application.route("/youraddress",methods=['GET','POST'])
+def usersms():
+    sms_host = "sms.yunpian.com"
+    port = 443
+    version = "v2"
+    sms_send_uri = "/" + version + "/sms/single_send.json"
+
+    data = request.json
+    apikey= data.get("apikey")
+    apikey = apikey.encode('UTF-8')
+    text =  data.get("text").encode('UTF-8')
+    mobile =  data.get("mobile").encode('UTF-8')
+
+    params = urllib.urlencode({'apikey': apikey, 'text': text, 'mobile':mobile})
+    headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
+    conn = httplib.HTTPSConnection(sms_host, port=port, timeout=30)
+    conn.request("POST", sms_send_uri, params, headers)
+    response = conn.getresponse()
+    response_str = response.read()
+    conn.close()
+
+    return response_str
